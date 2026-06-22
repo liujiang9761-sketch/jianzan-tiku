@@ -1,0 +1,30 @@
+<view class="container">
+  <view class="card">
+    <view class="filter-row">
+      <view class="filter-label">科目</view>
+      <picker mode="selector" range="{{subjects}}" range-key="name" bindchange="onSubjectChange">
+        <view class="filter-value">{{selSubject ? subjects.filter(s=>s.id==selSubject)[0].name : '全部科目'}} ›</view>
+      </picker>
+    </view>
+    <view class="divider"/>
+    <view class="filter-row">
+      <view class="filter-label">年份</view>
+      <picker mode="selector" range="{{years}}" bindchange="onYearChange">
+        <view class="filter-value">{{selYear ? selYear+'年' : '全部年份'}} ›</view>
+      </picker>
+    </view>
+    <view class="divider"/>
+    <view class="filter-row">
+      <view class="filter-label">题型</view>
+      <picker mode="selector" range="{{types}}" range-key="label" bindchange="onTypeChange">
+        <view class="filter-value">{{types.filter(t=>t.value==selType)[0].label}} ›</view>
+      </picker>
+    </view>
+  </view>
+
+  <view class="count-tip">共找到 <text class="count-num">{{totalCount}}</text> 道题</view>
+
+  <view style="padding:0 24rpx">
+    <view class="btn-primary" bindtap="startPractice">开始练习</view>
+  </view>
+</view>

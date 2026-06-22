@@ -1,0 +1,19 @@
+# Node
+node_modules/
+npm-debug.log*
+
+# SQLite 运行时文件（db 自动重建，无需提交）
+backend/tiku.db
+backend/tiku.db-shm
+backend/tiku.db-wal
+
+# 原始 PDF（体积太大）
+TK/
+
+# Python 编译缓存
+__pycache__/
+*.pyc
+
+# 系统文件
+.DS_Store
+Thumbs.db

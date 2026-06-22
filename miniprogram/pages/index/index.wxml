@@ -1,0 +1,34 @@
+<view class="container">
+
+  <!-- 顶部 banner -->
+  <swiper class="banner" autoplay interval="3000" circular indicator-dots>
+    <swiper-item wx:for="{{banner}}" wx:key="index">
+      <view class="banner-item">
+        <view class="banner-title">{{item.title}}</view>
+        <view class="banner-sub">{{item.sub}}</view>
+      </view>
+    </swiper-item>
+  </swiper>
+
+  <!-- 按科目刷题 -->
+  <view class="section-title">按科目刷题</view>
+  <view class="subject-grid">
+    <view class="subject-card" wx:for="{{subjects}}" wx:key="id"
+          data-id="{{item.id}}" data-name="{{item.name}}" bindtap="goSubject">
+      <view class="subject-icon">{{index===0?'🏗️':index===1?'💰':index===2?'📋':'⚖️'}}</view>
+      <view class="subject-name">{{item.name}}</view>
+    </view>
+  </view>
+
+  <!-- 按年份刷题 -->
+  <view class="section-title">按年份刷历年真题</view>
+  <view class="year-list">
+    <view class="year-item" wx:for="{{years}}" wx:key="item"
+          data-year="{{item}}" bindtap="goYearPractice">
+      <view class="year-num">{{item}}</view>
+      <view class="year-label">年真题</view>
+      <view class="year-arrow">›</view>
+    </view>
+  </view>
+
+</view>

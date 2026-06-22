@@ -1,0 +1,41 @@
+<view class="container" wx:if="{{stats}}">
+  <view class="result-hero">
+    <view class="hero-circle">
+      <view class="hero-num">{{stats.accuracy}}<text class="hero-unit">%</text></view>
+      <view class="hero-label">正确率</view>
+    </view>
+  </view>
+
+  <view class="stat-row card">
+    <view class="stat-item">
+      <view class="stat-num">{{stats.total}}</view>
+      <view class="stat-label">已做题目</view>
+    </view>
+    <view class="stat-divider"/>
+    <view class="stat-item">
+      <view class="stat-num green">{{stats.correct}}</view>
+      <view class="stat-label">答对</view>
+    </view>
+    <view class="stat-divider"/>
+    <view class="stat-item">
+      <view class="stat-num red">{{stats.wrong}}</view>
+      <view class="stat-label">答错</view>
+    </view>
+  </view>
+
+  <view class="card" wx:if="{{stats.bySubject.length}}">
+    <view class="section-sub-title">各科做题情况</view>
+    <view class="subject-row" wx:for="{{stats.bySubject}}" wx:key="subject_id">
+      <view class="sr-name">{{item.name}}</view>
+      <view class="sr-bar-wrap">
+        <view class="sr-bar-fill" style="width:{{item.correct_cnt/item.done*100||0}}%"/>
+      </view>
+      <view class="sr-count">{{item.done}}题</view>
+    </view>
+  </view>
+
+  <view style="padding:0 24rpx;display:flex;gap:20rpx;margin-top:8rpx">
+    <view class="btn-ghost" style="flex:1" bindtap="goWrong">查看错题本</view>
+    <view class="btn-primary" style="flex:1" bindtap="goHome">继续刷题</view>
+  </view>
+</view>

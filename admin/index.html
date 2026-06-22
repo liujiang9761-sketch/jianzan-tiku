@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>一级建造师题库 · 管理后台</title>
+<link rel="stylesheet" href="libs/element-plus.css">
+<script src="libs/vue.global.prod.js"></script>
+<script src="libs/element-plus.full.min.js"></script>
+<style>
+* { box-sizing: border-box; }
+body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #f0f2f5; }
+.layout { display: flex; min-height: 100vh; }
+.sidebar { width: 220px; background: #001529; color: #fff; padding: 0; flex-shrink: 0; }
+.sidebar-logo { padding: 20px 16px 16px; font-size: 16px; font-weight: bold; color: #fff; border-bottom: 1px solid #0d2137; }
+.sidebar-logo span { font-size: 12px; opacity: .6; display: block; margin-top: 2px; }
+.menu-item { padding: 12px 24px; cursor: pointer; display: flex; align-items: center; gap: 8px; font-size: 14px; transition: background .2s; }
+.menu-item:hover, .menu-item.active { background: #1890ff; }
+.main { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+.topbar { background: #fff; padding: 0 24px; height: 56px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 1px 4px rgba(0,21,41,.08); }
+.topbar-title { font-size: 16px; font-weight: 600; }
+.content { padding: 24px; flex: 1; }
+.card { background: #fff; border-radius: 8px; padding: 20px; margin-bottom: 16px; box-shadow: 0 1px 3px rgba(0,0,0,.06); }
+.filter-bar { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+.q-type-badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 12px; font-weight: 500; }
+.badge-single   { background: #e6f7ff; color: #1890ff; }
+.badge-multiple { background: #f6ffed; color: #52c41a; }
+.badge-case     { background: #fff7e6; color: #fa8c16; }
+.options-list { padding-left: 0; list-style: none; margin: 0; }
+.options-list li { margin-bottom: 6px; display: flex; gap: 6px; align-items: flex-start; }
+.opt-key { font-weight: 600; min-width: 20px; }
+.answer-tag { color: #52c41a; font-weight: bold; }
+.import-area { border: 2px dashed #d9d9d9; border-radius: 8px; padding: 32px; text-align: center; cursor: pointer; transition: border-color .2s; }
+.import-area:hover { border-color: #1890ff; }
+.stat-cards { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; margin-bottom: 20px; }
+.stat-card { background: #fff; border-radius: 8px; padding: 20px; text-align: center; box-shadow: 0 1px 3px rgba(0,0,0,.06); }
+.stat-num { font-size: 32px; font-weight: bold; color: #1890ff; }
+.stat-label { color: #666; font-size: 13px; margin-top: 4px; }
+.el-table .el-table__cell { padding: 8px 0; }
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="layout">
+    <!-- 侧边栏 -->
+    <div class="sidebar">
+      <div class="sidebar-logo">
+        📚 一建题库
+        <span>后台管理系统</span>
+      </div>
+      <div v-for="m in menus" :key="m.key"
+           class="menu-item" :class="{active: page===m.key}"
+           @click="page=m.key">
+        <span>{{m.icon}}</span><span>{{m.label}}</span>
+      </div>
+    </div>
+
+    <div class="main">
+      <div class="topbar">
+        <div class="topbar-title">{{menus.find(m=>m.key===page)?.label}}</div>
+        <div style="font-size:13px;color:#666">API: <code>{{apiBase}}</code></div>
+      </div>
+
+      <div class="content">
+
+        <!-- ===== 仪表盘 ===== -->
+        <div v-if="page==='dashboard'">
+          <div class="stat-cards">
+            <div class="stat-card" v-for="s in stats" :key="s.label">
+              <div class="stat-num">{{s.value}}</div>
+              <div class="stat-label">{{s.label}}</div>
+            </div>
+          </div>
+          <div class="card">
+            <div style="font-weight:600;margin-bottom:12px">各科题目分布</div>
+            <el-table :data="subjectStats" stripe>
+              <el-table-column prop="name" label="科目"/>
+              <el-table-column prop="total" label="总题数"/>
+              <el-table-column prop="single" label="单选"/>
+              <el-table-column prop="multiple" label="多选"/>
+              <el-table-column prop="case" label="案例"/>
+            </el-table>
+          </div>
+        </div>
+
+        <!-- ===== 题目列表 ===== -->
+        <div v-if="page==='questions'">
+          <div class="card filter-bar">
+            <el-select v-model="filter.subject_id" placeholder="科目" clearable style="width:200px" @change="loadQuestions">
+              <el-option v-for="s in subjects" :key="s.id" :label="s.name" :value="s.id"/>
+            </el-select>
+            <el-select v-model="filter.year" placeholder="年份" clearable style="width:120px" @change="loadQuestions">
+              <el-option v-for="y in years" :key="y" :label="y+'年'" :value="y"/>
+            </el-select>
+            <el-select v-model="filter.type" placeholder="题型" clearable style="width:120px" @change="loadQuestions">
+              <el-option label="单选题" value="single"/>
+              <el-option label="多选题" value="multiple"/>
+              <el-option label="案例题" value="case"/>
+            </el-select>
+            <el-input v-model="filter.keyword" placeholder="搜索题目内容" clearable style="width:200px" @keyup.enter="loadQuestions"/>
+            <el-button type="primary" @click="loadQuestions">搜索</el-button>
+            <el-button type="success" @click="openAdd">+ 新增题目</el-button>
+            <el-button @click="page='import'">批量导入</el-button>
+          </div>
+
+          <div class="card" style="padding:0">
+            <el-table :data="questions" v-loading="loading" row-key="id"
+                      @selection-change="selectedRows=$event">
+              <el-table-column type="selection" width="40"/>
+              <el-table-column prop="id" label="ID" width="60"/>
+              <el-table-column label="科目" width="160">
+                <template #default="{row}"><span style="font-size:12px">{{row.subject_name}}</span></template>
+              </el-table-column>
+              <el-table-column prop="year" label="年份" width="70"/>
+              <el-table-column label="题型" width="80">
+                <template #default="{row}">
+                  <span class="q-type-badge" :class="'badge-'+row.type">
+                    {{typeLabel(row.type)}}
+                  </span>
+                </template>
+              </el-table-column>
+              <el-table-column label="题目内容">
+                <template #default="{row}">
+                  <div style="max-width:400px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13px">
+                    {{row.content}}
+                  </div>
+                </template>
+              </el-table-column>
+              <el-table-column prop="answer" label="答案" width="80"/>
+              <el-table-column label="操作" width="130">
+                <template #default="{row}">
+                  <el-button size="small" @click="openEdit(row)">编辑</el-button>
+                  <el-button size="small" type="danger" @click="deleteQ(row.id)">删除</el-button>
+                </template>
+              </el-table-column>
+            </el-table>
+            <div style="padding:16px;display:flex;justify-content:space-between;align-items:center">
+              <el-button v-if="selectedRows.length" type="danger" size="small"
+                         @click="batchDelete">删除选中 ({{selectedRows.length}})</el-button>
+              <div v-else/>
+              <el-pagination
+                v-model:current-page="filter.page"
+                :page-size="filter.limit"
+                :total="total"
+                layout="total, prev, pager, next"
+                @current-change="loadQuestions"/>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== 批量导入 ===== -->
+        <div v-if="page==='import'">
+          <div class="card">
+            <h3 style="margin:0 0 16px">Excel 批量导入</h3>
+            <p style="color:#666;font-size:14px">Excel 表头格式（按顺序）：<br>
+              <code>subject_id | year | type | seq | content | options | answer | explanation | score</code>
+            </p>
+            <p style="color:#666;font-size:13px">
+              · <b>subject_id</b>: 1=建筑实务, 2=经济, 3=项目管理, 4=法规<br>
+              · <b>type</b>: single / multiple / case<br>
+              · <b>options</b>: JSON数组，如 <code>["A.选项A","B.选项B","C.选项C","D.选项D"]</code><br>
+              · <b>answer</b>: 单选填"A"，多选填"A,C"，案例填参考答案文字<br>
+              · <b>score</b>: 分值，默认1
+            </p>
+            <el-button @click="downloadTemplate" style="margin-bottom:16px">⬇ 下载模板</el-button>
+            <div class="import-area" @click="$refs.fileInput.click()" @dragover.prevent @drop.prevent="handleDrop">
+              <div style="font-size:40px">📄</div>
+              <div style="margin-top:8px;font-size:14px;color:#666">点击选择或拖拽 Excel 文件到此处</div>
+              <input ref="fileInput" type="file" accept=".xlsx,.xls" style="display:none" @change="handleFile">
+            </div>
+          </div>
+
+          <div class="card">
+            <h3 style="margin:0 0 16px">JSON 批量导入</h3>
+            <el-input v-model="jsonData" type="textarea" :rows="10" placeholder='[{"subject_id":1,"year":2024,"type":"single","seq":1,"content":"题目内容...","options":["A.xxx","B.xxx","C.xxx","D.xxx"],"answer":"A","explanation":"解析...","score":1}]'/>
+            <el-button type="primary" style="margin-top:12px" @click="importJson">导入 JSON</el-button>
+          </div>
+        </div>
+
+        <!-- ===== API 设置 ===== -->
+        <div v-if="page==='settings'">
+          <div class="card">
+            <h3 style="margin:0 0 16px">API 地址设置</h3>
+            <el-input v-model="apiBaseInput" style="max-width:400px"/>
+            <el-button type="primary" style="margin-left:8px" @click="saveApiBase">保存</el-button>
+            <p style="color:#666;font-size:13px;margin-top:12px">
+              默认: http://localhost:3000<br>
+              如果后端部署到服务器，修改为实际地址。
+            </p>
+          </div>
+        </div>
+
+      </div><!-- content -->
+    </div><!-- main -->
+  </div><!-- layout -->
+
+  <!-- 新增/编辑弹窗 -->
+  <el-dialog v-model="dialogVisible" :title="editingId?'编辑题目':'新增题目'" width="700px" top="5vh">
+    <el-form :model="form" label-width="90px" style="max-height:70vh;overflow-y:auto;padding-right:8px">
+      <el-form-item label="科目" required>
+        <el-select v-model="form.subject_id" style="width:100%">
+          <el-option v-for="s in subjects" :key="s.id" :label="s.name" :value="s.id"/>
+        </el-select>
+      </el-form-item>
+      <el-form-item label="年份" required>
+        <el-input-number v-model="form.year" :min="2010" :max="2030" style="width:140px"/>
+        <span style="margin-left:8px;color:#999">序号</span>
+        <el-input-number v-model="form.seq" :min="1" style="width:100px;margin-left:8px"/>
+      </el-form-item>
+      <el-form-item label="题型" required>
+        <el-radio-group v-model="form.type">
+          <el-radio value="single">单选题</el-radio>
+          <el-radio value="multiple">多选题</el-radio>
+          <el-radio value="case">案例题</el-radio>
+        </el-radio-group>
+      </el-form-item>
+      <el-form-item label="题目内容" required>
+        <el-input v-model="form.content" type="textarea" :rows="4" placeholder="输入题目内容（可含小标题，如"背景资料：…"）"/>
+      </el-form-item>
+      <el-form-item label="选项" v-if="form.type!=='case'">
+        <div v-for="(opt,i) in form.options" :key="i" style="display:flex;gap:8px;margin-bottom:8px">
+          <span style="font-weight:600;padding-top:7px">{{String.fromCharCode(65+i)}}.</span>
+          <el-input v-model="form.options[i]" style="flex:1"/>
+          <el-button size="small" @click="form.options.splice(i,1)">✕</el-button>
+        </div>
+        <el-button size="small" @click="form.options.push('')">+ 添加选项</el-button>
+      </el-form-item>
+      <el-form-item label="正确答案" required>
+        <el-input v-model="form.answer" placeholder="单选：A  多选：A,C  案例：参考答案文字"/>
+      </el-form-item>
+      <el-form-item label="解析">
+        <el-input v-model="form.explanation" type="textarea" :rows="4" placeholder="答题思路、考点、相关规范条文等"/>
+      </el-form-item>
+      <el-form-item label="分值">
+        <el-input-number v-model="form.score" :min="0.5" :step="0.5" style="width:120px"/>
+      </el-form-item>
+    </el-form>
+    <template #footer>
+      <el-button @click="dialogVisible=false">取消</el-button>
+      <el-button type="primary" @click="saveQuestion">保存</el-button>
+    </template>
+  </el-dialog>
+
+</div>
+
+<script>
+const { createApp, ref, reactive, computed, onMounted } = Vue;
+
+createApp({
+  setup() {
+    const page = ref('dashboard');
+    const loading = ref(false);
+    const apiBase = ref(localStorage.getItem('apiBase') || 'http://localhost:3000');
+    const apiBaseInput = ref(apiBase.value);
+
+    const menus = [
+      { key:'dashboard', icon:'📊', label:'仪表盘' },
+      { key:'questions', icon:'📝', label:'题目管理' },
+      { key:'import',    icon:'📥', label:'批量导入' },
+      { key:'settings',  icon:'⚙️',  label:'设置' },
+    ];
+
+    const subjects = ref([]);
+    const years    = ref([2020,2021,2022,2023,2024,2025]);
+    const questions = ref([]);
+    const total    = ref(0);
+    const selectedRows = ref([]);
+    const stats    = ref([]);
+    const subjectStats = ref([]);
+    const jsonData = ref('');
+
+    const filter = reactive({ subject_id:'', year:'', type:'', keyword:'', page:1, limit:20 });
+
+    const dialogVisible = ref(false);
+    const editingId     = ref(null);
+    const form = reactive({
+      subject_id: '', year: new Date().getFullYear(), type: 'single',
+      seq: 1, content: '', options: ['','','',''], answer: '', explanation: '', score: 1
+    });
+
+    function api(path, opts={}) {
+      return fetch(apiBase.value + path, {
+        headers: { 'Content-Type': 'application/json' },
+        ...opts
+      }).then(r => r.json());
+    }
+
+    async function loadSubjects() {
+      subjects.value = await api('/api/subjects');
+    }
+
+    async function loadQuestions() {
+      loading.value = true;
+      const p = new URLSearchParams();
+      Object.entries(filter).forEach(([k,v]) => { if(v) p.set(k,v); });
+      const data = await api('/api/questions?' + p.toString());
+      questions.value = data.data || [];
+      total.value = data.total || 0;
+      loading.value = false;
+    }
+
+    async function loadDashboard() {
+      const qs = await api('/api/questions?limit=1');
+      const total_q = qs.total || 0;
+      // 分题型统计
+      const [s1,s2,s3] = await Promise.all([
+        api('/api/questions?type=single&limit=1'),
+        api('/api/questions?type=multiple&limit=1'),
+        api('/api/questions?type=case&limit=1'),
+      ]);
+      stats.value = [
+        { label:'题目总数', value: total_q },
+        { label:'单选题',   value: s1.total||0 },
+        { label:'多选题',   value: s2.total||0 },
+        { label:'案例题',   value: s3.total||0 },
+      ];
+      // 各科
+      const subs = subjects.value;
+      subjectStats.value = await Promise.all(subs.map(async s => {
+        const [all,si,mu,ca] = await Promise.all([
+          api(`/api/questions?subject_id=${s.id}&limit=1`),
+          api(`/api/questions?subject_id=${s.id}&type=single&limit=1`),
+          api(`/api/questions?subject_id=${s.id}&type=multiple&limit=1`),
+          api(`/api/questions?subject_id=${s.id}&type=case&limit=1`),
+        ]);
+        return { name:s.name, total:all.total||0, single:si.total||0, multiple:mu.total||0, case:ca.total||0 };
+      }));
+    }
+
+    function typeLabel(t) {
+      return { single:'单选', multiple:'多选', case:'案例' }[t] || t;
+    }
+
+    function openAdd() {
+      editingId.value = null;
+      Object.assign(form, { subject_id:'', year:new Date().getFullYear(), type:'single', seq:1, content:'', options:['','','',''], answer:'', explanation:'', score:1 });
+      dialogVisible.value = true;
+    }
+
+    function openEdit(row) {
+      editingId.value = row.id;
+      Object.assign(form, {
+        subject_id: row.subject_id, year: row.year, type: row.type, seq: row.seq,
+        content: row.content,
+        options: Array.isArray(row.options) ? [...row.options] : ['','','',''],
+        answer: row.answer, explanation: row.explanation, score: row.score
+      });
+      dialogVisible.value = true;
+    }
+
+    async function saveQuestion() {
+      const payload = {
+        ...form,
+        options: form.type === 'case' ? [] : form.options.filter(o=>o.trim())
+      };
+      if (editingId.value) {
+        await api(`/api/questions/${editingId.value}`, { method:'PUT', body:JSON.stringify(payload) });
+        ElementPlus.ElMessage.success('修改成功');
+      } else {
+        await api('/api/questions', { method:'POST', body:JSON.stringify(payload) });
+        ElementPlus.ElMessage.success('添加成功');
+      }
+      dialogVisible.value = false;
+      loadQuestions();
+      if(page.value==='dashboard') loadDashboard();
+    }
+
+    async function deleteQ(id) {
+      await ElementPlus.ElMessageBox.confirm('确认删除这道题目？', '提示', { type:'warning' });
+      await api(`/api/questions/${id}`, { method:'DELETE' });
+      ElementPlus.ElMessage.success('删除成功');
+      loadQuestions();
+    }
+
+    async function batchDelete() {
+      const ids = selectedRows.value.map(r=>r.id);
+      await ElementPlus.ElMessageBox.confirm(`确认删除选中的 ${ids.length} 道题目？`, '提示', { type:'warning' });
+      await api('/api/questions/batch-delete', { method:'POST', body:JSON.stringify({ids}) });
+      ElementPlus.ElMessage.success(`已删除 ${ids.length} 道题`);
+      loadQuestions();
+    }
+
+    async function handleFile(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      const fd = new FormData();
+      fd.append('file', file);
+      const res = await fetch(apiBase.value + '/api/questions/import', { method:'POST', body:fd }).then(r=>r.json());
+      ElementPlus.ElMessage.success(`导入完成：成功 ${res.ok} 条，失败 ${res.fail} 条`);
+      if (res.errors?.length) console.warn('导入错误:', res.errors);
+      e.target.value = '';
+      loadDashboard();
+    }
+
+    function handleDrop(e) {
+      const file = e.dataTransfer.files[0];
+      if (!file) return;
+      const fd = new FormData();
+      fd.append('file', file);
+      fetch(apiBase.value + '/api/questions/import', { method:'POST', body:fd })
+        .then(r=>r.json())
+        .then(res => {
+          ElementPlus.ElMessage.success(`导入完成：成功 ${res.ok} 条，失败 ${res.fail} 条`);
+          loadDashboard();
+        });
+    }
+
+    async function importJson() {
+      if (!jsonData.value.trim()) return ElementPlus.ElMessage.warning('请输入 JSON 数据');
+      const res = await api('/api/questions/import', { method:'POST', body: JSON.stringify({ data: jsonData.value }) });
+      ElementPlus.ElMessage.success(`导入完成：成功 ${res.ok} 条，失败 ${res.fail} 条`);
+      jsonData.value = '';
+      loadDashboard();
+    }
+
+    function downloadTemplate() {
+      const headers = ['subject_id','year','type','seq','content','options','answer','explanation','score'];
+      const example = [1,2024,'single',1,'关于工程施工方案的说法，正确的是（  ）。','["A.选项一","B.选项二","C.选项三","D.选项四"]','A','本题考点：施工方案相关规定',1];
+      const csv = [headers.join(','), example.join(',')].join('\n');
+      const blob = new Blob(['﻿'+csv], { type:'text/csv;charset=utf-8' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = '题目导入模板.csv';
+      a.click();
+    }
+
+    function saveApiBase() {
+      apiBase.value = apiBaseInput.value;
+      localStorage.setItem('apiBase', apiBase.value);
+      ElementPlus.ElMessage.success('已保存，刷新页面生效');
+    }
+
+    onMounted(async () => {
+      await loadSubjects();
+      await loadDashboard();
+      await loadQuestions();
+    });
+
+    // 切换页面时刷新数据
+    function watchPage(newPage) {
+      if (newPage === 'questions') loadQuestions();
+      if (newPage === 'dashboard') loadDashboard();
+    }
+    // 简单 watch
+    let prevPage = page.value;
+    setInterval(() => {
+      if (page.value !== prevPage) { watchPage(page.value); prevPage = page.value; }
+    }, 100);
+
+    return {
+      page, menus, loading, subjects, years, questions, total, selectedRows,
+      filter, dialogVisible, editingId, form, stats, subjectStats, jsonData,
+      apiBase, apiBaseInput,
+      loadQuestions, openAdd, openEdit, saveQuestion, deleteQ, batchDelete,
+      handleFile, handleDrop, importJson, downloadTemplate, saveApiBase, typeLabel
+    };
+  }
+}).use(ElementPlus).mount('#app');
+</script>
+</body>
+</html>

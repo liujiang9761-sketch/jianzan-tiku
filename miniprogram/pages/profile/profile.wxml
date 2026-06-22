@@ -1,0 +1,63 @@
+<view class="container">
+  <!-- 头部 -->
+  <view class="profile-header">
+    <view class="avatar">📚</view>
+    <view class="profile-info">
+      <view class="profile-name">一建备考中</view>
+      <view class="profile-sub">每天刷题，稳步提升</view>
+    </view>
+  </view>
+
+  <!-- 做题统计 -->
+  <view class="card" wx:if="{{stats}}">
+    <view class="card-title">我的做题记录</view>
+    <view class="stats-grid">
+      <view class="stats-cell">
+        <view class="stats-num blue">{{stats.total}}</view>
+        <view class="stats-label">已做题数</view>
+      </view>
+      <view class="stats-cell">
+        <view class="stats-num green">{{stats.correct}}</view>
+        <view class="stats-label">答对</view>
+      </view>
+      <view class="stats-cell">
+        <view class="stats-num red">{{stats.wrong}}</view>
+        <view class="stats-label">答错</view>
+      </view>
+      <view class="stats-cell">
+        <view class="stats-num">{{stats.accuracy}}%</view>
+        <view class="stats-label">正确率</view>
+      </view>
+    </view>
+
+    <view class="divider"/>
+
+    <view wx:for="{{stats.bySubject}}" wx:key="subject_id" class="sub-row">
+      <view class="sub-name">{{item.name}}</view>
+      <view class="sub-bar-wrap">
+        <view class="sub-bar" style="width:{{item.correct_cnt/(item.done||1)*100}}%"/>
+      </view>
+      <view class="sub-val">{{item.done}}题</view>
+    </view>
+  </view>
+
+  <!-- 收藏 -->
+  <view class="card" wx:if="{{favTotal}}">
+    <view class="card-title-row">
+      <view class="card-title">我的收藏</view>
+      <view class="more-btn" bindtap="goFavorites">查看全部({{favTotal}}) ›</view>
+    </view>
+    <view wx:for="{{favorites}}" wx:key="id" class="fav-item">
+      <view class="fav-q">{{item.content}}</view>
+      <view class="fav-meta">{{item.subject_name}} · {{item.year}}年</view>
+    </view>
+  </view>
+
+  <!-- 操作 -->
+  <view class="card">
+    <view class="menu-row" bindtap="clearCache">
+      <text>🗑️  清除本地缓存</text>
+      <text class="menu-arrow">›</text>
+    </view>
+  </view>
+</view>

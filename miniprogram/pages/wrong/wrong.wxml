@@ -1,0 +1,56 @@
+<view class="container">
+  <!-- 筛选栏 -->
+  <view class="filter-bar card">
+    <picker mode="selector" range="{{subjects}}" range-key="name" bindchange="onSubjectChange">
+      <view class="filter-value">{{selSubject ? subjects.filter(s=>s.id==selSubject)[0].name : '全部科目'}} ›</view>
+    </picker>
+    <view class="total-tip">共 <text class="blue">{{total}}</text> 道错题</view>
+  </view>
+
+  <!-- 错题列表 -->
+  <view wx:if="{{questions.length}}">
+    <view class="card q-item" wx:for="{{questions}}" wx:key="id" data-idx="{{index}}">
+      <view class="q-meta">
+        <view class="tag tag-{{item.type}}">{{typeLabel[item.type]}}</view>
+        <text class="q-year">{{item.year}}年</text>
+        <text class="q-subject">{{item.subject_name}}</text>
+      </view>
+      <view class="q-content">{{item.content}}</view>
+
+      <!-- 选项 -->
+      <view wx:if="{{item.type !== 'case'}}">
+        <view wx:for="{{item.options}}" wx:for-item="opt" wx:key="index"
+              class="opt-row {{item.answer.indexOf(opt[0])!==-1 ? 'opt-correct' : ''}}
+                             {{item.my_answer && item.my_answer.indexOf(opt[0])!==-1 && item.answer.indexOf(opt[0])===-1 ? 'opt-wrong' : ''}}">
+          <text class="opt-key">{{opt[0]}}</text>
+          <text class="opt-text">{{opt.slice(2)}}</text>
+        </view>
+      </view>
+
+      <!-- 我的答案 vs 正确答案 -->
+      <view class="answer-compare" wx:if="{{item.type !== 'case'}}">
+        <text class="ans-wrong">我的答案：{{item.my_answer || '未作答'}}</text>
+        <text class="ans-correct">正确答案：{{item.answer}}</text>
+      </view>
+      <view class="answer-compare" wx:else>
+        <text class="ans-correct">参考答案：{{item.answer}}</text>
+      </view>
+
+      <!-- 解析折叠 -->
+      <view class="explain-toggle" data-idx="{{index}}" bindtap="toggleExplain">
+        💡 {{item.showExplain ? '收起解析' : '查看解析'}}
+      </view>
+      <view wx:if="{{item.showExplain}}" class="explain-box">
+        {{item.explanation || '暂无解析'}}
+      </view>
+    </view>
+
+    <view class="load-more" wx:if="{{questions.length < total}}">上拉加载更多</view>
+    <view class="load-more" wx:else>已加载全部错题</view>
+  </view>
+
+  <view wx:if="{{!loading && !questions.length}}" class="empty">
+    <view>🎉</view>
+    <view>错题本是空的，继续加油！</view>
+  </view>
+</view>

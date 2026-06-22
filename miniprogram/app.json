@@ -1,0 +1,29 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/subject/subject",
+    "pages/practice/practice",
+    "pages/result/result",
+    "pages/wrong/wrong",
+    "pages/profile/profile"
+  ],
+  "tabBar": {
+    "color": "#999",
+    "selectedColor": "#1677ff",
+    "borderStyle": "white",
+    "list": [
+      { "pagePath": "pages/index/index",   "text": "首页",   "iconPath": "assets/home.png",    "selectedIconPath": "assets/home-active.png" },
+      { "pagePath": "pages/wrong/wrong",   "text": "错题本", "iconPath": "assets/wrong.png",   "selectedIconPath": "assets/wrong-active.png" },
+      { "pagePath": "pages/profile/profile","text": "我的",  "iconPath": "assets/profile.png", "selectedIconPath": "assets/profile-active.png" }
+    ]
+  },
+  "window": {
+    "backgroundTextStyle": "light",
+    "navigationBarBackgroundColor": "#1677ff",
+    "navigationBarTitleText": "一建刷题",
+    "navigationBarTextStyle": "white",
+    "backgroundColor": "#f5f5f5"
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json"
+}

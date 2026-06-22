@@ -1,0 +1,38 @@
+.container { padding-bottom: 40rpx; }
+
+.profile-header {
+  background: linear-gradient(135deg, #1677ff, #4096ff);
+  padding: 48rpx 32rpx;
+  display: flex;
+  align-items: center;
+  gap: 24rpx;
+}
+.avatar { font-size: 80rpx; }
+.profile-name { font-size: 36rpx; font-weight: bold; color: #fff; }
+.profile-sub  { font-size: 24rpx; color: rgba(255,255,255,.8); margin-top: 6rpx; }
+
+.card-title { font-size: 30rpx; font-weight: 600; color: #222; margin-bottom: 20rpx; }
+.card-title-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16rpx; }
+.more-btn { font-size: 24rpx; color: #1677ff; }
+
+.stats-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 8rpx; margin-bottom: 16rpx; }
+.stats-cell { text-align: center; }
+.stats-num  { font-size: 44rpx; font-weight: bold; color: #333; }
+.stats-num.blue  { color: #1677ff; }
+.stats-num.green { color: #52c41a; }
+.stats-num.red   { color: #ff4d4f; }
+.stats-label { font-size: 22rpx; color: #888; margin-top: 4rpx; }
+
+.sub-row { display: flex; align-items: center; gap: 12rpx; margin-bottom: 14rpx; }
+.sub-name { font-size: 22rpx; color: #555; width: 180rpx; flex-shrink: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sub-bar-wrap { flex: 1; height: 12rpx; background: #f0f0f0; border-radius: 6rpx; overflow: hidden; }
+.sub-bar { height: 12rpx; background: #1677ff; border-radius: 6rpx; }
+.sub-val { font-size: 22rpx; color: #888; width: 60rpx; text-align: right; }
+
+.fav-item { padding: 16rpx 0; border-bottom: 1rpx solid #f0f0f0; }
+.fav-item:last-child { border-bottom: none; }
+.fav-q { font-size: 26rpx; color: #333; line-height: 1.5; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+.fav-meta { font-size: 22rpx; color: #999; margin-top: 6rpx; }
+
+.menu-row { display: flex; justify-content: space-between; align-items: center; padding: 8rpx 0; font-size: 28rpx; color: #333; }
+.menu-arrow { color: #ccc; font-size: 36rpx; }

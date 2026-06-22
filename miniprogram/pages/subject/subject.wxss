@@ -1,0 +1,12 @@
+.container { padding: 24rpx 0 40rpx; }
+
+.filter-row {
+  display: flex;
+  align-items: center;
+  padding: 8rpx 0;
+}
+.filter-label { font-size: 28rpx; color: #555; width: 80rpx; flex-shrink: 0; }
+.filter-value { flex: 1; text-align: right; color: #1677ff; font-size: 28rpx; }
+
+.count-tip { text-align: center; color: #888; font-size: 26rpx; margin: 32rpx 0 24rpx; }
+.count-num { color: #1677ff; font-size: 36rpx; font-weight: bold; }

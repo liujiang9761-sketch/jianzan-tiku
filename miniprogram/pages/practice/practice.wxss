@@ -1,0 +1,97 @@
+.container { padding-bottom: 160rpx; }
+
+.progress-bar { height: 6rpx; background: #eee; }
+.progress-fill { height: 6rpx; background: #1677ff; transition: width .3s; }
+.progress-text {
+  display: flex;
+  justify-content: space-between;
+  padding: 12rpx 24rpx;
+  font-size: 24rpx;
+  color: #888;
+}
+.fav-btn { color: #fa8c16; font-size: 26rpx; }
+
+.q-card { margin-top: 8rpx; }
+.q-meta { display: flex; align-items: center; gap: 12rpx; margin-bottom: 16rpx; flex-wrap: wrap; }
+.q-year, .q-subject { font-size: 22rpx; color: #888; }
+
+.q-content { font-size: 30rpx; line-height: 1.7; color: #222; margin-bottom: 24rpx; white-space: pre-wrap; }
+
+.option-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 16rpx;
+  padding: 20rpx 20rpx;
+  border: 2rpx solid #eee;
+  border-radius: 12rpx;
+  margin-bottom: 16rpx;
+  transition: all .15s;
+}
+.option-item:active { opacity: .8; }
+
+.opt-selected { border-color: #1677ff; background: #e6f4ff; }
+.opt-correct  { border-color: #52c41a; background: #f6ffed; }
+.opt-wrong    { border-color: #ff4d4f; background: #fff2f0; }
+
+.opt-key {
+  width: 48rpx;
+  height: 48rpx;
+  border-radius: 50%;
+  background: #f0f0f0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 24rpx;
+  flex-shrink: 0;
+}
+.opt-selected .opt-key { background: #1677ff; color: #fff; }
+.opt-correct  .opt-key { background: #52c41a; color: #fff; }
+.opt-wrong    .opt-key { background: #ff4d4f; color: #fff; }
+
+.opt-text { flex: 1; font-size: 28rpx; line-height: 1.6; padding-top: 6rpx; }
+.opt-icon { font-size: 32rpx; padding-top: 4rpx; }
+
+.case-tip { color: #999; font-size: 26rpx; text-align: center; padding: 20rpx 0; }
+
+.result-bar {
+  margin: 0 24rpx;
+  padding: 20rpx 24rpx;
+  border-radius: 12rpx;
+  font-size: 28rpx;
+  font-weight: 500;
+  margin-bottom: 16rpx;
+}
+.result-correct { background: #f6ffed; color: #52c41a; }
+.result-wrong   { background: #fff2f0; color: #ff4d4f; }
+
+.explain-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #333;
+}
+.explain-arrow { color: #888; font-size: 22rpx; }
+.explain-content { margin-top: 16rpx; }
+.case-answer {
+  background: #f5f5f5;
+  border-radius: 8rpx;
+  padding: 16rpx;
+  font-size: 26rpx;
+  color: #333;
+  white-space: pre-wrap;
+  margin-bottom: 12rpx;
+}
+.explain-text { font-size: 26rpx; color: #555; line-height: 1.8; white-space: pre-wrap; }
+
+.bottom-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 20rpx 24rpx 40rpx;
+  background: #fff;
+  box-shadow: 0 -2rpx 12rpx rgba(0,0,0,.06);
+}

@@ -1,0 +1,83 @@
+<view class="container" wx:if="{{!loading && questions.length}}">
+  <!-- 顶部进度条 -->
+  <view class="progress-bar">
+    <view class="progress-fill" style="width:{{(current+1)/total*100}}%"/>
+  </view>
+  <view class="progress-text">
+    <text>{{current+1}} / {{total}}</text>
+    <text class="fav-btn" bindtap="toggleFavorite">{{favorited?'★':'☆'}} 收藏</text>
+  </view>
+
+  <!-- 题目卡片 -->
+  <view class="card q-card">
+    <!-- 题型标签 + 年份 -->
+    <view class="q-meta">
+      <view class="tag tag-{{questions[current].type}}">{{typeLabel[questions[current].type]}}</view>
+      <text class="q-year">{{questions[current].year}}年</text>
+      <text class="q-subject">{{questions[current].subject_name}}</text>
+    </view>
+
+    <!-- 题目内容 -->
+    <view class="q-content">{{questions[current].content}}</view>
+
+    <!-- 选项（单选/多选） -->
+    <view wx:if="{{questions[current].type !== 'case'}}">
+      <view wx:for="{{questions[current].options}}" wx:key="key"
+            class="option-item {{answered && questions[current].answer.indexOf(item.key)!==-1 ? 'opt-correct' : ''}}
+                               {{answered && userAnswer.indexOf(item.key)!==-1 && questions[current].answer.indexOf(item.key)===-1 ? 'opt-wrong' : ''}}
+                               {{!answered && userAnswer.indexOf(item.key)!==-1 ? 'opt-selected' : ''}}"
+            data-key="{{item.key}}"
+            bindtap="{{questions[current].type==='single' ? 'selectSingle' : 'selectMultiple'}}">
+        <view class="opt-key">{{item.key}}</view>
+        <view class="opt-text">{{item.text}}</view>
+        <view class="opt-icon" wx:if="{{answered}}">
+          {{questions[current].answer.indexOf(item.key)!==-1 ? '✓' : (userAnswer.indexOf(item.key)!==-1 ? '✗' : '')}}
+        </view>
+      </view>
+    </view>
+
+    <!-- 案例题 -->
+    <view wx:if="{{questions[current].type === 'case'}}" class="case-tip">
+      案例分析题，请在查看答案后自评。
+    </view>
+  </view>
+
+  <!-- 答题结果 -->
+  <view wx:if="{{answered}}" class="result-bar {{isCorrect ? 'result-correct' : 'result-wrong'}}">
+    <text wx:if="{{questions[current].type !== 'case'}}">
+      {{isCorrect ? '✓ 回答正确！' : '✗ 回答错误，正确答案：' + questions[current].answer}}
+    </text>
+    <text wx:else>参考答案如下</text>
+  </view>
+
+  <!-- 解析 -->
+  <view class="card" wx:if="{{answered}}">
+    <view class="explain-title" bindtap="toggleExplain">
+      <text>💡 答题解析</text>
+      <text class="explain-arrow">{{showExplain ? '▲' : '▼'}}</text>
+    </view>
+    <view wx:if="{{showExplain}}" class="explain-content">
+      <view wx:if="{{questions[current].type === 'case'}}" class="case-answer">
+        {{questions[current].answer}}
+      </view>
+      <view class="explain-text">{{questions[current].explanation || '暂无解析'}}</view>
+    </view>
+  </view>
+
+  <!-- 底部操作栏 -->
+  <view class="bottom-bar">
+    <view wx:if="{{!answered}}">
+      <view wx:if="{{questions[current].type !== 'case'}}" class="btn-primary" bindtap="submit">提交答案</view>
+      <view wx:else class="btn-primary" bindtap="submitCase">查看答案</view>
+    </view>
+    <view wx:else class="btn-primary" bindtap="next">
+      {{current+1 >= total ? '查看结果' : '下一题 →'}}
+    </view>
+  </view>
+</view>
+
+<!-- 加载中 -->
+<view wx:if="{{loading}}" class="empty">加载题目中...</view>
+
+<!-- 无题目 -->
+<view wx:if="{{!loading && !questions.length}}" class="empty">暂无题目</view>
