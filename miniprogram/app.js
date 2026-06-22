@@ -1,5 +1,4 @@
-// 修改这里填入你的后端地址
-const API_BASE = 'http://localhost:3000';
+const API_BASE = 'https://jianzan-tiku-production.up.railway.app';
 
 App({
   globalData: {
