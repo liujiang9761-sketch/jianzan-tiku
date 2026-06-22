@@ -8,6 +8,7 @@ Page({
     loading: false,
     subjects: [],
     selSubject: '',
+    selSubjectName: '全部科目',
     typeLabel: { single: '单选题', multiple: '多选题', case: '案例题' },
   },
 
@@ -52,7 +53,7 @@ Page({
 
   onSubjectChange(e) {
     const sub = this.data.subjects[e.detail.value];
-    this.setData({ selSubject: sub ? sub.id : '', page: 1, questions: [] });
+    this.setData({ selSubject: sub ? sub.id : '', selSubjectName: sub ? sub.name : '全部科目', page: 1, questions: [] });
     this.loadWrong();
   },
 

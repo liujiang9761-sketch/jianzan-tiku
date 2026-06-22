@@ -14,8 +14,10 @@ Page({
       { label: '案例题',   value: 'case' },
     ],
     selSubject: '',
+    selSubjectName: '全部科目',
     selYear: '',
     selType: '',
+    selTypeName: '全部题型',
     totalCount: 0,
   },
 
@@ -47,7 +49,8 @@ Page({
   },
 
   onSubjectChange(e) {
-    this.setData({ selSubject: this.data.subjects[e.detail.value]?.id || '' });
+    const sub = this.data.subjects[e.detail.value];
+    this.setData({ selSubject: sub?.id || '', selSubjectName: sub?.name || '全部科目' });
     this.loadCount();
   },
   onYearChange(e) {
@@ -55,7 +58,8 @@ Page({
     this.loadCount();
   },
   onTypeChange(e) {
-    this.setData({ selType: this.data.types[e.detail.value]?.value || '' });
+    const t = this.data.types[e.detail.value];
+    this.setData({ selType: t?.value || '', selTypeName: t?.label || '全部题型' });
     this.loadCount();
   },
 

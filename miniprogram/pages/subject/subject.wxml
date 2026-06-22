@@ -3,7 +3,7 @@
     <view class="filter-row">
       <view class="filter-label">科目</view>
       <picker mode="selector" range="{{subjects}}" range-key="name" bindchange="onSubjectChange">
-        <view class="filter-value">{{selSubject ? subjects.filter(s=>s.id==selSubject)[0].name : '全部科目'}} ›</view>
+        <view class="filter-value">{{selSubjectName}} ›</view>
       </picker>
     </view>
     <view class="divider"/>
@@ -17,7 +17,7 @@
     <view class="filter-row">
       <view class="filter-label">题型</view>
       <picker mode="selector" range="{{types}}" range-key="label" bindchange="onTypeChange">
-        <view class="filter-value">{{types.filter(t=>t.value==selType)[0].label}} ›</view>
+        <view class="filter-value">{{selTypeName}} ›</view>
       </picker>
     </view>
   </view>

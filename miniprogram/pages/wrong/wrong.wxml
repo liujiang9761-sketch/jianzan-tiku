@@ -2,7 +2,7 @@
   <!-- 筛选栏 -->
   <view class="filter-bar card">
     <picker mode="selector" range="{{subjects}}" range-key="name" bindchange="onSubjectChange">
-      <view class="filter-value">{{selSubject ? subjects.filter(s=>s.id==selSubject)[0].name : '全部科目'}} ›</view>
+      <view class="filter-value">{{selSubjectName}} ›</view>
     </picker>
     <view class="total-tip">共 <text class="blue">{{total}}</text> 道错题</view>
   </view>
